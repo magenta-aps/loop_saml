@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Adds support for ADFS SAML integration.
+ */
 
 /**
  * Implements hook_menu().
@@ -47,11 +51,8 @@ function loop_saml_redirect() {
 
   // Add i-frame that log out the user at adfs.
   $output = array(
-    '#markup' => '<iframe src="https://adfs.aarhuskommune.dk/adfs/ls/?wa=wsignout1.0" frameborder="0" width="0px" height="0px"></iframe>',
+    '#markup' => '<iframe src="https://adfs.aarhuskommune.dk/adfs/ls/?wa=wsignout1.0" frameborder="0" width="0px" height="0px"></iframe><p>' . t('Please wait while you are being logged out of the system.') . '</p>',
   );
-
-  // Add message to the user.
-  $output[] = '<p>' . t('Plase wait while we are logging you out of the system.') . '</p>';
 
   drupal_add_js(drupal_get_path('module', 'loop_saml') . '/js/loop_saml.js');
 
@@ -131,15 +132,14 @@ function loop_saml_form_user_profile_form_alter(&$form, &$form_state) {
 }
 
 /**
- * Setup LOOP specicfic acocunt details.
+ * Setup LOOP specific account details.
  *
  * @param object $account
- *   Drupal account
- *
+ *   Drupal account.
  * @param array $attributes
  *   SAML attributes.
  */
-function _loop_saml_setup_account($account, $attributes) {
+function _loop_saml_setup_account($account, array $attributes) {
   $fullename = $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/displayname'][0];
 
   $names = preg_split("/\s+(?=\S*+$)/", $fullename);
@@ -149,4 +149,3 @@ function _loop_saml_setup_account($account, $attributes) {
   $wrapper->field_last_name->set($names[1]);
   $wrapper->save();
 }
-
